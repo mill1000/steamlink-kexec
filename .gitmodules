@@ -1,0 +1,6 @@
+[submodule "tools/kexec-tools"]
+	path = tools/kexec-tools
+	url = git://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git
+[submodule "tools/kexec-module"]
+	path = tools/kexec-module
+	url = https://github.com/amonakov/kexec-module.git
