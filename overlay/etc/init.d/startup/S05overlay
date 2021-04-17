@@ -1,0 +1,11 @@
+#!/bin/sh
+
+MOUNT_CONFIG=/mnt/config
+OVERLAY=$MOUNT_CONFIG/overlay
+
+mount_overlay() {
+	mkdir -p ${OVERLAY}${1}
+	mount -t unionfs -o dirs=${OVERLAY}${1}=rw:${1}=ro unionfs ${1}
+}
+
+mount_overlay /lib
