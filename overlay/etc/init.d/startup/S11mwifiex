@@ -1,0 +1,50 @@
+#!/bin/ash
+
+KERNEL_RELEASE=$(uname -r)
+if [ "$KERNEL_RELEASE" != "3.8.14-mrvl" ]; then
+  exit 0
+fi
+
+echo "Resetting WiFi."
+/bin/wifi_reset
+
+echo "Triggering mmc rescan."
+echo "1" > /sys/devices/soc.0/f7ab0000.sdhci/mmc_host/mmc0/rescan
+
+WIFI_IFACE=mlan0
+WIFI_REGION=US
+WIFI_MAC_FILE=/mnt/factory_setting/WIFI_MAC_ADDR
+
+echo "Loading modules."
+modprobe mwifiex reg_alpha2=${WIFI_REGION}
+modprobe mwifiex_sdio
+
+# Wait for the interface to come up
+echo -n "Waiting for ${WIFI_IFACE} to appear."
+fail=0
+until ifconfig $WIFI_IFACE > /dev/null 2>&1
+do
+  echo -n "."
+  sleep 1
+  fail=$((fail+1))
+  if [ "$fail" -gt 10 ]; then
+    echo "${WIFI_IFACE} failed to come up."
+    exit -1
+  fi
+done
+echo "OK"
+
+# Read mac address from file if it exists
+if [ -f "${WIFI_MAC_FILE}" ]; then
+  MAC=$(cat $WIFI_MAC_FILE | sed -r 's/(..)(..)(..)(..)(..)(..)/\1:\2:\3:\4:\5:\6/')
+
+  echo "Setting ${WIFI_IFACE} MAC address to ${MAC}"
+  ip link set dev ${WIFI_IFACE} down
+  ip link set dev ${WIFI_IFACE} address ${MAC}
+  ip link set dev ${WIFI_IFACE} up
+fi
+
+# Up the thread priority of ksdioirqd/mmc0 to RR 11 (it is normally priority
+# other 0). This is needed to reduce the likelihood of starvation caused
+# by one of the StreamingClient threads (which is of priority RR 10).
+chrt -p -r 11 $(pgrep ksdioirqd)
