@@ -7,3 +7,4 @@
 [submodule "steamlink-sdk"]
 	path = steamlink-sdk
 	url = https://github.com/mill1000/steamlink-sdk.git
+	branch = kexec/806
