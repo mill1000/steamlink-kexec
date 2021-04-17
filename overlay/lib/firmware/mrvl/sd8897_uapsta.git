@@ -1,0 +1,9 @@
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/mrvl/sd8897_uapsta.bin?id=6cfdd527ac7c9f638241f49e64512888d662090f
+
+linux-firmware: update Marvell SD8897-B0 firmware image
+WLAN (SDIO) firmware version: W15.68.19.17
+Bluetooth (SDIO) firmware version: 15.26.19.17
+The combo image can be downloaded through either WLAN or
+Bluetooth.
+
+Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
