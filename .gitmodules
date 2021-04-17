@@ -3,7 +3,8 @@
 	url = git://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git
 [submodule "tools/kexec-module"]
 	path = tools/kexec-module
-	url = https://github.com/amonakov/kexec-module.git
+	url = https://github.com/mill1000/kexec-module.git
+	branch = main
 [submodule "steamlink-sdk"]
 	path = steamlink-sdk
 	url = https://github.com/mill1000/steamlink-sdk.git
