@@ -1,0 +1,4 @@
+#!/bin/sh
+
+fts-set steamlink.crashcounter 0
+shutdown -r now
