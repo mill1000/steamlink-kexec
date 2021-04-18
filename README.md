@@ -18,14 +18,56 @@ Setup your enviroment.
 export ARCH=arm; export LOCALVERSION="-mrvl"; export CROSS_COMPILE=arm-linux-gnueabihf-
 ```
 
-Configure the kernel. This default is derived from `bg2cd_penguin_mlc_defconfig`.
+### Building kexec-module
+The kexec module must be built against the stock kernel otherwise the version magic won't match and it will refuse to load. We only need to do this once so either follow the instruction below or grab the pre-compiled module above.
+
+Switch to stock kernel and build modules.
 ```
-make steamlink_kexec_defconfig
+cd steamlink-sdk
+git checkout master
+
+cd kernel
+make bg2cd_penguin_mlc_defconfig
+make modules -j8
 ```
 
-Build.
+Build kexec module.
 ```
+cd tools/kexec-module/kernel
+KDIR=`git rev-parse --show-superproject-working-tree`/steamlink-sdk/kernel make
+```
+
+Build the kexec redirector while we're at it.
+```
+cd tools/kexec-module/usr
+make
+```
+
+Switch back to the updated kernel.
+```
+cd steamlink-sdk
+git checkout kexec/806
+```
+
+### Building kexec-tools
+```
+cd tools/kexec-tools
+./bootstrap
+./configure --host=arm-linux-gnueabihf
+make
+```
+
+### Building the kernel
+Configure the kernel. This default is derived from `bg2cd_penguin_mlc_defconfig`.
+```
+cd steamlink-sdk/kernel
+make steamlink_kexec_defconfig
 make -j8
+```
+
+We will need the modules as well so we'll install them to the overlay.
+```
+make INSTALL_MOD_PATH=`git rev-parse --show-superproject-working-tree`/overlay/ modules_install
 ```
 
 ## Organization
