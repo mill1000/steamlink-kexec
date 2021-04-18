@@ -130,7 +130,7 @@ tar -zcf - overlay/lib/modules/3.8.14-mrvl | ssh root@<steamlink_ip> "tar xzf - 
 tar -zcf - overlay/lib/firmware/mrvl | ssh root@<steamlink_ip> "tar xzf - -C /lib/firmware/mrvl"
 ```
 
-## Running the new kernel
+## Booting the new kernel
 Once the supporting files are installed, the new kernel can be loaded on boot by placing the `factory_test/run.sh` script on a FAT32 USB drive. The Steamlink will automatically mount and run the script, loading the new kernel shortly after startup.
 
 ```
@@ -140,6 +140,37 @@ cp factory_test/run.sh <path_to_drive>/steamlink/factory_test/run.sh
 Plug the USB drive into the Steamlink and reboot via `safe_reboot` or power cycle.
 
 To return to the stock kernel, simply remove the USB drive and reboot.
+
+### Booting via the terminal
+It is possible to boot the new kernel from the command line without using the factory_test script but without additional preparation it will fail.
+* Disable the watchdog. Remove or rename `/etc/init.d/startup/S80watchdog` and reboot the system. If left enabled, the watchdog will reboot the device before the new kernel has a chance to fully boot.
+* Disable the user interface. Remove or rename `/home/steam/rc.local`. This script loads additional modules, some tools and starts the Steamlink interface. Unfortunately its usually locks up or panics if the system was already initialized before.
+
+The following script can be used to boot the new kernel.
+```
+#!/bin/sh
+
+echo "Clearing steamlink.crashcounter."
+fts-set steamlink.crashcounter 0
+
+PRELOAD=
+KERNEL_RELEASE=$(uname -r)
+if [ "$KERNEL_RELEASE" == "3.8.13-mrvl" ]; then
+  # Stock kernel needs kexec module and preload
+  echo "Loading kexec kernel module."
+  insmod ~/kexec/kexec-mod.ko
+  PRELOAD=~/kexec/redir.so
+fi
+
+# Set command line args
+CMD_LINE="console=ttyS0,115200 earlyprintk root=/dev/mtdblock5 rootfstype=yaffs2 ro root_part_name=rootfs init=/sbin/init mtdparts=mv_nand:1M(block0),8M(bootloader),11M(env),512M(sysconf),32M(factory_setting),32M(bootimgs),128M(recovery),32M(fts),384M(factory),1G(rootfs),1924M(cache),8M(bbt)"
+
+echo "Loading new kernel into memory."
+LD_PRELOAD=${PRELOAD} ~/kexec/kexec --load ~/kernel/zImage --initrd ~/kernel/initramfs.cpio.gz --dtb ~/kernel/steamlink.dtb --command-line="${CMD_LINE}"
+
+echo "Starting new kernel."
+LD_PRELOAD=${PRELOAD} ~/kexec/kexec -e
+```
 
 ## Organization
 - extracted - Kernel, DTB, initramfs, and configs extracted from OEM firmware.
