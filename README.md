@@ -93,6 +93,7 @@ In addition, a `safe_reboot` script resets the crash counter before rebooting th
 
 ```
 scp overlay/etc/init.d/startup/* root@<steamlink_ip>:/etc/init.d/startup
+tar -zcf - -C overlay/usr/local/ . | ssh root@192.168.1.156 "tar xzf - -C /usr/local/"
 scp overlay/usr/local/* root@<steamlink_ip>:/usr/local
 ```
 
@@ -106,7 +107,7 @@ ssh root@<steamlink_ip> safe_reboot
 Now copy over the kexec files, either from their build locations or from the `overlay` directory of the repo.
 
 ```
-ssh root@<steamlink_ip> mkdir -p ~/kexec
+ssh root@<steamlink_ip> "mkdir -p ~/kexec"
 scp tools/kexec-module/kernel/kexec-mod.ko root@<steamlink_ip>:~/kexec
 scp tools/kexec-module/user/redir.so root@<steamlink_ip>:~/kexec
 scp tools/kexec-tools/build/sbin/kexec root@<steamlink_ip>:~/kexec
@@ -116,7 +117,7 @@ scp tools/kexec-tools/build/sbin/kexec root@<steamlink_ip>:~/kexec
 Copy over new kernel and the extracted DTB and initramfs.
 
 ```
-ssh root@<steamlink_ip> mkdir -p ~/kernel
+ssh root@<steamlink_ip> "mkdir -p ~/kernel"
 scp extracted/latest/steamlink.dtb root@<steamlink_ip>:~/kernel
 scp extracted/latest/initramfs.cpio.gz root@<steamlink_ip>:~/kernel
 scp steamlink-sdk/kernel/arch/arm/boot/zImage root@<steamlink_ip>:~/kernel
@@ -126,8 +127,8 @@ scp steamlink-sdk/kernel/arch/arm/boot/zImage root@<steamlink_ip>:~/kernel
 Using the new `/lib` overlay we will provide new firmware and modules for the new kernel.
 
 ```
-tar -zcf - overlay/lib/modules/3.8.14-mrvl | ssh root@<steamlink_ip> "tar xzf - -C /lib/modules"
-tar -zcf - overlay/lib/firmware/mrvl | ssh root@<steamlink_ip> "tar xzf - -C /lib/firmware/mrvl"
+tar -zcf - -C overlay/lib/modules/ 3.8.14-mrvl | ssh root@192.168.1.156 "tar xzf - -C /lib/modules"
+tar -zcf - -C overlay/lib/firmware/ mrvl | ssh root@192.168.1.156 "tar xzf - -C /lib/firmware"
 ```
 
 ## Booting the new kernel
