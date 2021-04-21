@@ -179,3 +179,10 @@ LD_PRELOAD=${PRELOAD} ~/kexec/kexec -e
 - overlay - Overlay file system needed to boot new kernel and load mwifiex drivers.
 - steamlink-sdk - Steamlink SDK provided by Valve including kernel sources and toolchain.
 - tools - Tools necessary to perform kexec on device.
+
+## References
+- https://heap.ovh/getting-linux-on-valve-steam-link.html
+- https://www.reddit.com/r/Steam_Link/comments/fgew5x/running_archlinux_on_steam_link_revisited/
+- https://github.com/lukas2511/steamlink-sdk
+- https://web.archive.org/web/20190925025431/http://www.livxtrm.com/steamlink/
+- https://forum.doozan.com/read.php?8,46664,page=1
