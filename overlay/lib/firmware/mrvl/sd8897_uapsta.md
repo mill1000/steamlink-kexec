@@ -9,6 +9,9 @@ Bluetooth.
 
 Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
 
+# sd8897_uapsta.bin 15.68.7.p206
+Copied from Steamlink with firmware v806
+
 # sd8897_uapsta.bin 15.68.7.p154
 https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/mrvl/sd8897_uapsta.bin?id=c38c231a07beb579d3f4a2916bbb5eb1c29984ff
 
