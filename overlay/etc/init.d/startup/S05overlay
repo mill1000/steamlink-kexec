@@ -1,11 +1,10 @@
 #!/bin/sh
 
-MOUNT_CONFIG=/mnt/config
-OVERLAY=$MOUNT_CONFIG/overlay
+# Only enable /lib overlay if non-stock kernel
+KERNEL_RELEASE=$(uname -r)
+if [ "$KERNEL_RELEASE" != "3.8.13-mrvl" ]; then
+  echo "Enabling /lib overlay."
+  mkdir -p /mnt/config/overlay/lib
+  mount -t unionfs -o dirs=/mnt/config/overlay/lib=rw:/lib=ro unionfs /lib
+fi
 
-mount_overlay() {
-	mkdir -p ${OVERLAY}${1}
-	mount -t unionfs -o dirs=${OVERLAY}${1}=rw:${1}=ro unionfs ${1}
-}
-
-mount_overlay /lib
