@@ -1,0 +1,35 @@
+#!/bin/sh
+
+FIRMWARE_FILE="/lib/firmware/mrvl/sd8897_uapsta.bin"
+
+OEM_FIRMWARE="/lib/firmware/mrvl/sd8897_uapsta_15.68.7.p206.bin"
+REPLACEMENT_FIRMWARE="/lib/firmware/mrvl/sd8897_uapsta_15.68.7.p18.bin"
+
+if [ >> $FIRMWARE_FILE ]; then
+  # We can write to this file
+else
+  echo "Read-only ${FIRMWARE_FILE}. Nothing to do."
+  exit 0
+fi
+
+LINK_TARGET=
+
+KERNEL_RELEASE=$(uname -r)
+if [ "$KERNEL_RELEASE" == "3.8.13-mrvl" ]; then
+  if [ -f $OEM_FIRMWARE ]; then
+    LINK_TARGET=$OEM_FIRMWARE
+  else
+    echo "No OEM firmware found."
+    exit -1
+  fi
+elif [ "$KERNEL_RELEASE" == "3.8.14-mrvl" ]; then
+  if [ -f $OEM_FIRMWARE ]; then
+    LINK_TARGET=$REPLACEMENT_FIRMWARE
+  else
+    echo "No replacement firmware found."
+    exit -1
+  fi
+fi
+
+echo "$(basename $FIRMWARE_FILE) -> $(basename $LINK_TARGET)"
+ln -s $LINK_TARGET $FIRMWARE_FILE
